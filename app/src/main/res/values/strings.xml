@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">全能工具箱</string>
+    <string name="home_title">硬件检测</string>
+    <string name="toolbox_title">工具箱</string>
+    <string name="firmware_title">固件查询</string>
+    <string name="profile_title">我的</string>
+    <string name="export_report">导出报告</string>
+    <string name="cpu_info">CPU信息</string>
+    <string name="gpu_info">GPU信息</string>
+    <string name="screen_info">屏幕参数</string>
+    <string name="battery_info">电池信息</string>
+    <string name="system_info">系统信息</string>
+    <string name="app_extract">APK提取</string>
+    <string name="app_info">应用信息</string>
+    <string name="system_shortcuts">系统快捷</string>
+    <string name="settings">原生设置</string>
+    <string name="developer_options">开发者选项</string>
+    <string name="hardware_entry">硬件检测</string>
+    <string name="dark_mode">深色模式</string>
+    <string name="notification">通知设置</string>
+    <string name="about">关于软件</string>
+    <string name="shizuku_status">Shizuku权限</string>
+    <string name="activate_member">激活会员</string>
+    <string name="device_code">设备代码</string>
+    <string name="enter_code">输入激活码</string>
+    <string name="activate">激活</string>
+    <string name="update_check">检查更新</string>
+    <string name="about_developer">了解开发者</string>
+    <string name="report_saved">报告已保存</string>
+    <string name="activation_success">激活成功</string>
+    <string name="activation_failed">激活码无效或已使用</string>
+    <string name="member_required">请先激活会员使用此功能</string>
+</resources>

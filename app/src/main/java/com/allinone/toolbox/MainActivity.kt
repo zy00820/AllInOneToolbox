@@ -28,6 +28,13 @@ import com.allinone.toolbox.ui.toolbox.SystemShortcutsScreen
 import com.allinone.toolbox.ui.profile.ActivateMemberScreen
 import com.allinone.toolbox.ui.profile.AboutDeveloperScreen
 import com.allinone.toolbox.ui.profile.AboutAppScreen
+import com.allinone.toolbox.ui.brand.XiaomiSectionScreen
+import com.allinone.toolbox.ui.brand.VivoSectionScreen
+import com.allinone.toolbox.ui.brand.OppoSectionScreen
+import com.allinone.toolbox.ui.brand.SamsungSectionScreen
+import com.allinone.toolbox.ui.brand.HuaweiSectionScreen
+import com.allinone.toolbox.ui.tools.BatteryModifyScreen
+import com.allinone.toolbox.ui.tools.SceneActivateScreen
 import com.allinone.toolbox.ui.theme.ThemeViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -159,7 +166,14 @@ fun MainContent(themeViewModel: ThemeViewModel) {
                     paddingValues = paddingValues,
                     onNavigateToAppExtract = { navController.navigate(Screen.AppExtract.route) },
                     onNavigateToAppInfo = { navController.navigate(Screen.AppInfo.route) },
-                    onNavigateToSystemShortcuts = { navController.navigate(Screen.SystemShortcuts.route) }
+                    onNavigateToSystemShortcuts = { navController.navigate(Screen.SystemShortcuts.route) },
+                    onNavigateToXiaomi = { navController.navigate(Screen.XiaomiSection.route) },
+                    onNavigateToVivo = { navController.navigate(Screen.VivoSection.route) },
+                    onNavigateToOppo = { navController.navigate(Screen.OppoSection.route) },
+                    onNavigateToSamsung = { navController.navigate(Screen.SamsungSection.route) },
+                    onNavigateToHuawei = { navController.navigate(Screen.HuaweiSection.route) },
+                    onNavigateToBatteryModify = { navController.navigate(Screen.BatteryModify.route) },
+                    onNavigateToSceneActivate = { navController.navigate(Screen.SceneActivate.route) }
                 )
             }
             composable(Screen.Firmware.route) {
@@ -191,6 +205,41 @@ fun MainContent(themeViewModel: ThemeViewModel) {
             }
             composable(Screen.SystemShortcuts.route) {
                 SystemShortcutsScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.XiaomiSection.route) {
+                XiaomiSectionScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.VivoSection.route) {
+                VivoSectionScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.OppoSection.route) {
+                OppoSectionScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.SamsungSection.route) {
+                SamsungSectionScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.HuaweiSection.route) {
+                HuaweiSectionScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.BatteryModify.route) {
+                BatteryModifyScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.SceneActivate.route) {
+                SceneActivateScreen(
                     onBack = { navController.popBackStack() }
                 )
             }

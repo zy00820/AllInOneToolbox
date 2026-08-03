@@ -80,7 +80,7 @@ fun AboutAppScreen(
                         modifier = Modifier.padding(top = 8.dp)
                     )
                     Text(
-                        text = "Version 1.0.10",
+                        text = "Version 1.0.11",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                     )
@@ -157,6 +157,8 @@ fun AboutAppScreen(
                         text = "版本日志",
                         style = MaterialTheme.typography.titleMedium
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    VersionLogItem("V1.0.11", "工具箱新增五大品牌专属板块（小米/vivo/OPPO/三星/华为）\n小米板块新增「强开极致模式」\n新增电量修改工具（需 Shizuku）\n新增一键激活 Scene 模块")
                     Spacer(modifier = Modifier.height(8.dp))
                     VersionLogItem("V1.0.10", "适配Android 15/16 (API 36)\n支持16KB内存页对齐\n升级Gradle/Kotlin/Compose工具链\n优化Edge-to-Edge全面屏体验")
                     Spacer(modifier = Modifier.height(8.dp))

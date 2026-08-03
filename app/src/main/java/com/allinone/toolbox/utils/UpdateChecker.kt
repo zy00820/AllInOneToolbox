@@ -11,24 +11,25 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * 检查更新工具（国内加速版）
+ * 检查更新工具（国内加速版 · V1.1.1 修复 jsdelivr 缓存问题）
  *
- * 查询策略：
- *  1. 优先走 jsdelivr CDN 读取仓库内的 version.json（国内访问快）
- *  2. jsdelivr 失败时降级到 GitHub API（兜底，国内较慢）
+ * 查询策略（V1.1.1 调整优先级）：
+ *  1. 优先走 GitHub Release API（实时无缓存，最准确）
+ *  2. 降级 jsdelivr CDN（有 ~12h 缓存，仅作兜底）
  *
  * 下载策略：
  *  - 多镜像节点自动降级，按测速排序（优先快节点）
  *  - 节点失败时自动切换到下一个，最终回退 GitHub 直链
  *
- * 注：原 mirror.ghproxy.com 已下线（2024 年底起 SSL 失效），换为 gh-proxy.com 等可用节点。
+ * 注：原 jsdelivr 优先方案有 CDN 缓存问题——即使仓库 version.json 已更新到 1.1.1，
+ * jsdelivr 可能仍返回 1.0.14，导致 APP 误判"已是最新版本"。改为 GitHub API 优先。
  */
 object UpdateChecker {
 
-    // 版本清单（jsdelivr CDN，国内加速，从仓库 @main 拉取 version.json）
+    // 备用：jsdelivr CDN（国内加速，但有缓存延迟，仅作兜底）
     private const val JSDELIVR_VERSION_JSON =
         "https://cdn.jsdelivr.net/gh/zy00820/AllInOneToolbox@main/version.json"
-    // 备用：GitHub API 直接查最新 Release
+    // 首选：GitHub API 直接查最新 Release（实时无缓存）
     private const val GITHUB_API_LATEST =
         "https://api.github.com/repos/zy00820/AllInOneToolbox/releases/latest"
     // Release 下载页
@@ -77,12 +78,12 @@ object UpdateChecker {
     }
 
     suspend fun checkLatestVersion(): UpdateResult = withContext(Dispatchers.IO) {
-        // 1) 首选 jsdelivr CDN
-        val fromCdn = fetchFromJsdelivr()
-        if (fromCdn != null) return@withContext fromCdn
-        // 2) 降级 GitHub API
+        // 1) 首选 GitHub Release API（实时无缓存，最准确）
         val fromGh = fetchFromGitHub()
-        fromGh ?: UpdateResult.Failed("检查失败：网络不可用或所有查询源均失败")
+        if (fromGh != null) return@withContext fromGh
+        // 2) 降级 jsdelivr CDN（有缓存延迟，仅兜底）
+        val fromCdn = fetchFromJsdelivr()
+        fromCdn ?: UpdateResult.Failed("检查失败：网络不可用或所有查询源均失败")
     }
 
     private suspend fun fetchFromJsdelivr(): UpdateResult? = withContext(Dispatchers.IO) {

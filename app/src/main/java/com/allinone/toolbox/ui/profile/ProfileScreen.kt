@@ -232,20 +232,24 @@ fun ProfileScreen(
                         Text("当前版本：V${BuildConfig.VERSION_NAME}")
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "将用浏览器打开 GitHub Release 页面下载新版本 APK。",
+                            text = "推荐用「直接下载」（国内加速镜像），速度更快。",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 },
                 confirmButton = {
-                    TextButton(onClick = {
-                        UpdateChecker.openReleasePage(context)
-                        updateResult = null
-                    }) { Text("前往下载") }
-                },
-                dismissButton = {
-                    TextButton(onClick = { updateResult = null }) { Text("稍后") }
+                    Row {
+                        TextButton(onClick = {
+                            UpdateChecker.openReleasePage(context)
+                            updateResult = null
+                        }) { Text("Release 页") }
+                        TextButton(onClick = {
+                            UpdateChecker.openApkDownload(context, result.apkUrl)
+                            updateResult = null
+                        }) { Text("直接下载") }
+                        TextButton(onClick = { updateResult = null }) { Text("稍后") }
+                    }
                 }
             )
         }

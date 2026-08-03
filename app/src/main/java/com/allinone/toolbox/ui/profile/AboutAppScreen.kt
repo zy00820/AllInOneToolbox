@@ -159,6 +159,8 @@ fun AboutAppScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+                    VersionLogItem("V1.0.13", "检查更新换用 jsdelivr CDN 查询 + ghproxy 镜像下载，国内访问更快\n新版本对话框新增「直接下载」按钮")
+                    Spacer(modifier = Modifier.height(8.dp))
                     VersionLogItem("V1.0.12", "修复检查更新功能：真实联网查询 GitHub 最新 Release\n修复版本号写死问题，全部改为动态读取\n发现新版本支持一键跳转浏览器下载")
                     Spacer(modifier = Modifier.height(8.dp))
                     VersionLogItem("V1.0.11", "工具箱新增五大品牌专属板块（小米/vivo/OPPO/三星/华为）\n小米板块新增「强开极致模式」\n新增电量修改工具（需 Shizuku）\n新增一键激活 Scene 模块")

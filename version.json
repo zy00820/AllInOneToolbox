@@ -1,15 +1,17 @@
 {
-  "versionName": "1.1.0",
-  "versionCode": 16,
-  "title": "全能工具箱 V1.1.0 - 修复Shizuku伪授权问题",
-  "apkUrl": "https://github.com/zy00820/AllInOneToolbox/releases/download/v1.1.0/AllInOneToolbox-v1.1.0.apk",
-  "releasePage": "https://github.com/zy00820/AllInOneToolbox/releases/tag/v1.1.0",
+  "versionName": "1.1.1",
+  "versionCode": 17,
+  "title": "全能工具箱 V1.1.1 - 内置 Shizuku 官方 API",
+  "apkUrl": "https://github.com/zy00820/AllInOneToolbox/releases/download/v1.1.1/AllInOneToolbox-v1.1.1.apk",
+  "releasePage": "https://github.com/zy00820/AllInOneToolbox/releases/tag/v1.1.1",
   "changelog": [
-    "修复Shizuku授权问题：旧版仅设置SharedPreferences开关，未真正绑定Shizuku服务",
-    "新增ShizukuManager工具类：检测App安装/服务运行/执行id命令验证uid等级",
-    "新增独立「Shizuku授权管理」页面，四步引导用户安装→启动→授权→验证",
-    "Profile页Shizuku条目不再是伪Toggle，而是展示真实授权状态并跳转到授权页",
-    "极致模式/电量修改/Scene激活改为真正校验Shizuku Authorized(uid=0/2000)才能执行",
-    "Shizuku验证状态分四档：Authorized/ServiceRunning/PrefOnly/Denied"
+    "真正内置 Shizuku 官方客户端：集成 dev.rikka.shizuku:api:13.1.5 + provider:13.1.5",
+    "新增 rikka.shizuku.ShizukuProvider：通过 ContentProvider.call 真正接收 Shizuku 服务推送的 Binder",
+    "App 启动注册 BinderReceivedListener/BinderDeadListener，实时追踪 Shizuku 服务存活状态",
+    "权限判定升级：Shizuku.pingBinder + checkSelfPermission + getUid 三重官方API校验",
+    "命令执行升级：优先 Shizuku.newProcess()（真正 shell 身份），再 fallback Runtime.exec",
+    "Shizuku 授权页新增「请求 Shizuku 官方授权」按钮：直接弹出原生授权弹窗",
+    "AndroidManifest 声明 moe.shizuku.manager.permission.API_V23 与 <queries> 适配安卓 11+ 包可见性",
+    "版本号升至 1.1.1 (versionCode=17)"
   ]
 }

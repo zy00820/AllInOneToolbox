@@ -21,8 +21,8 @@ android {
         applicationId "com.allinone.toolbox"
         minSdk rootProject.min_sdk
         targetSdk rootProject.target_sdk
-        versionCode 16
-        versionName "1.1.0"
+        versionCode 17
+        versionName "1.1.1"
     }
 
     buildTypes {
@@ -84,6 +84,12 @@ dependencies {
     implementation 'androidx.datastore:datastore-preferences:1.1.1'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0'
+
+    // ===== Shizuku 官方 API（V1.1.1 真正集成，替换原有 hack 实现）=====
+    // 文档：https://github.com/RikkaApps/Shizuku-API
+    def shizuku_version = "13.1.5"
+    implementation "dev.rikka.shizuku:api:$shizuku_version"
+    implementation "dev.rikka.shizuku:provider:$shizuku_version"
 
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'

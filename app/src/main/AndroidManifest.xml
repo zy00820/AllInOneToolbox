@@ -6,9 +6,17 @@
         tools:ignore="QueryAllPackagesPermission" />
     <!-- 仅用于「检查更新」联网查询 GitHub 最新 Release，无后台请求 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- ===== Shizuku 官方 API 权限（V1.1.1 内置） ===== -->
+    <!-- 通过此权限声明让 Shizuku 服务知道我们是合法调用方 -->
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
 
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature android:name="android.hardware.type.pc" android:required="false" />
+
+    <!-- Android 11+ 需要显式 queries 才能检测到 Shizuku App 是否安装 -->
+    <queries>
+        <package android:name="moe.shizuku.privileged.api" />
+    </queries>
 
     <application
         android:name=".App"
@@ -29,6 +37,17 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- ===== ShizukuProvider（V1.1.1 新增） =====
+             Shizuku 服务通过 ContentProvider#call() 向本应用推送 Binder
+             exported=true + INTERACT_ACROSS_USERS_FULL 保护：只有系统/Shizuku 能访问 -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
         <activity
             android:name=".MainActivity"

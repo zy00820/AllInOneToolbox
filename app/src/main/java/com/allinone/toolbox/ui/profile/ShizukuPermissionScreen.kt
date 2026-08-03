@@ -290,6 +290,34 @@ fun ShizukuPermissionScreen(
                             Text("  打开 Shizuku App（启动服务）")
                         }
                     }
+
+                    // V1.1.1 新增：调用 Shizuku 官方授权弹窗（收到 Binder 但用户还没点"允许"时用）
+                    if (appInstalled && permissionStatus === ShizukuManager.PermissionStatus.ServiceRunning) {
+                        Button(
+                            onClick = {
+                                val ok = ShizukuManager.requestOfficialPermission()
+                                Toast.makeText(
+                                    context,
+                                    if (ok) "已弹出授权窗口，请在 Shizuku 弹窗中点击「允许」"
+                                    else "Shizuku Binder 尚未就绪，请先在 Shizuku App 内启动服务",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                scope.launch {
+                                    delay(800)
+                                    refresh(
+                                        onApp = { appInstalled = it },
+                                        onStatus = { permissionStatus = it },
+                                        onPrefs = { prefsToggle = it }
+                                    )
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.Security, contentDescription = null)
+                            Spacer(modifier = Modifier.height(0.dp))
+                            Text("  请求 Shizuku 官方授权")
+                        }
+                    }
                     OutlinedButton(
                         onClick = {
                             scope.launch {

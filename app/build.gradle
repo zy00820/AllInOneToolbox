@@ -21,8 +21,8 @@ android {
         applicationId "com.allinone.toolbox"
         minSdk rootProject.min_sdk
         targetSdk rootProject.target_sdk
-        versionCode 11
-        versionName "1.0.11"
+        versionCode 12
+        versionName "1.0.12"
     }
 
     buildTypes {
@@ -49,6 +49,8 @@ android {
 
     buildFeatures {
         compose true
+        // 启用 BuildConfig，用于动态读取版本号（检查更新比对）
+        buildConfig true
     }
 
     // Android 15/16: 单语言应用，禁用自动语言配置以避免需要resources.properties

@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.allinone.toolbox.BuildConfig
 import com.allinone.toolbox.ui.theme.ThemeViewModel
 import com.allinone.toolbox.utils.ActivationUtils
 import com.allinone.toolbox.utils.DeviceUtils
@@ -60,7 +61,7 @@ fun HomeScreen(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "V1.0.9 · 纯本地离线工具",
+                text = "V${BuildConfig.VERSION_NAME} · 纯本地离线工具",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

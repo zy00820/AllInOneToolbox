@@ -32,11 +32,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,9 +47,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.allinone.toolbox.BuildConfig
 import com.allinone.toolbox.ui.theme.ThemeViewModel
 import com.allinone.toolbox.utils.ActivationUtils
 import com.allinone.toolbox.utils.DeviceUtils
+import com.allinone.toolbox.utils.UpdateChecker
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,6 +67,9 @@ fun ProfileScreen(
     val isDarkMode by themeViewModel.isDarkMode.collectAsState()
     val isMember by themeViewModel.isMember.collectAsState()
     var shizukuStatus by remember { mutableStateOf(DeviceUtils.checkShizukuPermission()) }
+    val scope = rememberCoroutineScope()
+    var checking by remember { mutableStateOf(false) }
+    var updateResult by remember { mutableStateOf<UpdateChecker.UpdateResult?>(null) }
 
     LazyColumn(
         modifier = Modifier
@@ -154,9 +163,30 @@ fun ProfileScreen(
             SettingsCard(
                 icon = Icons.Default.Update,
                 title = "检查更新",
-                subtitle = "当前版本 V1.0.9",
+                subtitle = if (checking) "正在检查…" else "当前版本 V${BuildConfig.VERSION_NAME}",
                 onClick = {
-                    Toast.makeText(context, "当前已是最新版本", Toast.LENGTH_SHORT).show()
+                    if (checking) return@SettingsCard
+                    checking = true
+                    scope.launch {
+                        val result = UpdateChecker.checkLatestVersion()
+                        checking = false
+                        when (result) {
+                            is UpdateChecker.UpdateResult.Success -> {
+                                if (result.hasUpdate) {
+                                    updateResult = result
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "当前已是最新版本 (V${result.latestVersion})",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                            is UpdateChecker.UpdateResult.Failed -> {
+                                Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
                 }
             )
         }
@@ -165,7 +195,7 @@ fun ProfileScreen(
             SettingsCard(
                 icon = Icons.Default.Info,
                 title = "关于软件",
-                subtitle = "全能工具箱 V1.0.9",
+                subtitle = "全能工具箱 V${BuildConfig.VERSION_NAME}",
                 onClick = onNavigateToAboutApp
             )
         }
@@ -182,10 +212,41 @@ fun ProfileScreen(
         item {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "全能工具箱 V1.0.9\n纯本地离线 · 无广告 · 无追踪",
+                text = "全能工具箱 V${BuildConfig.VERSION_NAME}\n纯本地离线 · 检查更新联网查询 GitHub",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+
+    // 发现新版本对话框
+    updateResult?.let { result ->
+        if (result is UpdateChecker.UpdateResult.Success) {
+            AlertDialog(
+                onDismissRequest = { updateResult = null },
+                title = { Text("发现新版本") },
+                text = {
+                    Column {
+                        Text("最新版本：V${result.latestVersion}")
+                        Text("当前版本：V${BuildConfig.VERSION_NAME}")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "将用浏览器打开 GitHub Release 页面下载新版本 APK。",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        UpdateChecker.openReleasePage(context)
+                        updateResult = null
+                    }) { Text("前往下载") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { updateResult = null }) { Text("稍后") }
+                }
             )
         }
     }

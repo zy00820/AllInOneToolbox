@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.allinone.toolbox.BuildConfig
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +81,7 @@ fun AboutAppScreen(
                         modifier = Modifier.padding(top = 8.dp)
                     )
                     Text(
-                        text = "Version 1.0.11",
+                        text = "Version ${BuildConfig.VERSION_NAME}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                     )
@@ -157,6 +158,8 @@ fun AboutAppScreen(
                         text = "版本日志",
                         style = MaterialTheme.typography.titleMedium
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    VersionLogItem("V1.0.12", "修复检查更新功能：真实联网查询 GitHub 最新 Release\n修复版本号写死问题，全部改为动态读取\n发现新版本支持一键跳转浏览器下载")
                     Spacer(modifier = Modifier.height(8.dp))
                     VersionLogItem("V1.0.11", "工具箱新增五大品牌专属板块（小米/vivo/OPPO/三星/华为）\n小米板块新增「强开极致模式」\n新增电量修改工具（需 Shizuku）\n新增一键激活 Scene 模块")
                     Spacer(modifier = Modifier.height(8.dp))

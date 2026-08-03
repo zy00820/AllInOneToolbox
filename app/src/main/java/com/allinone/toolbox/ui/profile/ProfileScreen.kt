@@ -43,6 +43,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +52,7 @@ import com.allinone.toolbox.BuildConfig
 import com.allinone.toolbox.ui.theme.ThemeViewModel
 import com.allinone.toolbox.utils.ActivationUtils
 import com.allinone.toolbox.utils.DeviceUtils
+import com.allinone.toolbox.utils.ShizukuManager
 import com.allinone.toolbox.utils.UpdateChecker
 import kotlinx.coroutines.launch
 
@@ -61,12 +63,14 @@ fun ProfileScreen(
     themeViewModel: ThemeViewModel,
     onNavigateToActivate: () -> Unit,
     onNavigateToAboutDeveloper: () -> Unit,
-    onNavigateToAboutApp: () -> Unit
+    onNavigateToAboutApp: () -> Unit,
+    onNavigateToShizuku: () -> Unit  // V1.1.0 新增：跳转到真正的 Shizuku 授权页
 ) {
     val context = LocalContext.current
     val isDarkMode by themeViewModel.isDarkMode.collectAsState()
     val isMember by themeViewModel.isMember.collectAsState()
-    var shizukuStatus by remember { mutableStateOf(DeviceUtils.checkShizukuPermission()) }
+    // V1.1.0：真正显示 Shizuku 状态（不再是伪开关）
+    var shizukuRealStatus by remember { mutableStateOf(ShizukuManager.checkPermission()) }
     val scope = rememberCoroutineScope()
     var checking by remember { mutableStateOf(false) }
     var updateResult by remember { mutableStateOf<UpdateChecker.UpdateResult?>(null) }
@@ -104,39 +108,45 @@ fun ProfileScreen(
         }
 
         item {
+            // V1.1.0：真正的Shizuku状态文字（不再是伪开关）
+            val (statusText, statusColor) = when (shizukuRealStatus) {
+                is ShizukuManager.PermissionStatus.Authorized ->
+                    "已真正授权（uid " + (shizukuRealStatus as ShizukuManager.PermissionStatus.Authorized).level + "）" to
+                        MaterialTheme.colorScheme.primary
+                ShizukuManager.PermissionStatus.ServiceRunning ->
+                    "服务运行中，待授权..." to Color(0xFFF9A825)
+                ShizukuManager.PermissionStatus.PrefOnly ->
+                    "仅UI伪授权（旧版）" to Color(0xFFEF6C00)
+                ShizukuManager.PermissionStatus.Denied ->
+                    "未授权" to MaterialTheme.colorScheme.error
+            }
             SettingsCard(
                 icon = Icons.Default.DeveloperBoard,
                 title = "Shizuku权限",
-                subtitle = if (shizukuStatus) "已授权" else "未授权",
+                subtitle = statusText,
                 onClick = {
-                    if (!ActivationUtils.isMember()) {
-                        Toast.makeText(context, "请先激活会员", Toast.LENGTH_SHORT).show()
-                        onNavigateToActivate()
-                    } else {
-                        shizukuStatus = !shizukuStatus
-                        val prefs = context.getSharedPreferences("all_in_one_prefs", android.content.Context.MODE_PRIVATE)
-                        prefs.edit().putBoolean("shizuku_authorized", shizukuStatus).apply()
-                        Toast.makeText(
-                            context,
-                            if (shizukuStatus) "Shizuku权限已开启" else "Shizuku权限已关闭",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    // V1.1.0：跳转到专用授权管理页（不再Toggle伪开关）
+                    shizukuRealStatus = ShizukuManager.checkPermission()
+                    onNavigateToShizuku()
                 },
                 trailing = {
                     FilterChip(
-                        selected = shizukuStatus,
+                        selected = shizukuRealStatus is ShizukuManager.PermissionStatus.Authorized,
                         onClick = {
-                            if (!ActivationUtils.isMember()) {
-                                Toast.makeText(context, "请先激活会员", Toast.LENGTH_SHORT).show()
-                                onNavigateToActivate()
-                            } else {
-                                shizukuStatus = !shizukuStatus
-                                val prefs = context.getSharedPreferences("all_in_one_prefs", android.content.Context.MODE_PRIVATE)
-                                prefs.edit().putBoolean("shizuku_authorized", shizukuStatus).apply()
-                            }
+                            shizukuRealStatus = ShizukuManager.checkPermission()
+                            onNavigateToShizuku()
                         },
-                        label = { Text(if (shizukuStatus) "已授权" else "未授权") }
+                        label = {
+                            Text(
+                                text = when (shizukuRealStatus) {
+                                    is ShizukuManager.PermissionStatus.Authorized -> "已授权"
+                                    ShizukuManager.PermissionStatus.ServiceRunning -> "待授权"
+                                    ShizukuManager.PermissionStatus.PrefOnly -> "伪授权"
+                                    ShizukuManager.PermissionStatus.Denied -> "未授权"
+                                },
+                                color = statusColor
+                            )
+                        }
                     )
                 }
             )

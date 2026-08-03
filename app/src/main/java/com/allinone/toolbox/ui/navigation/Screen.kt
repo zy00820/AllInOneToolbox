@@ -12,6 +12,8 @@ sealed class Screen(val route: String) {
     data object ActivateMember : Screen("activate_member")
     data object AboutDeveloper : Screen("about_developer")
     data object AboutApp : Screen("about_app")
+    // V1.1.0 新增：真正的 Shizuku 授权管理页（修复伪授权问题）
+    data object ShizukuPermission : Screen("shizuku_permission")
 
     // V1.0.11 新增：品牌专属板块
     data object XiaomiSection : Screen("xiaomi_section")

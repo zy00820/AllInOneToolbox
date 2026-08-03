@@ -28,6 +28,7 @@ import com.allinone.toolbox.ui.toolbox.SystemShortcutsScreen
 import com.allinone.toolbox.ui.profile.ActivateMemberScreen
 import com.allinone.toolbox.ui.profile.AboutDeveloperScreen
 import com.allinone.toolbox.ui.profile.AboutAppScreen
+import com.allinone.toolbox.ui.profile.ShizukuPermissionScreen
 import com.allinone.toolbox.ui.brand.XiaomiSectionScreen
 import com.allinone.toolbox.ui.brand.VivoSectionScreen
 import com.allinone.toolbox.ui.brand.OppoSectionScreen
@@ -185,7 +186,8 @@ fun MainContent(themeViewModel: ThemeViewModel) {
                     themeViewModel = themeViewModel,
                     onNavigateToActivate = { navController.navigate(Screen.ActivateMember.route) },
                     onNavigateToAboutDeveloper = { navController.navigate(Screen.AboutDeveloper.route) },
-                    onNavigateToAboutApp = { navController.navigate(Screen.AboutApp.route) }
+                    onNavigateToAboutApp = { navController.navigate(Screen.AboutApp.route) },
+                    onNavigateToShizuku = { navController.navigate(Screen.ShizukuPermission.route) }
                 )
             }
             composable(Screen.Hardware.route) {
@@ -255,6 +257,12 @@ fun MainContent(themeViewModel: ThemeViewModel) {
             }
             composable(Screen.AboutApp.route) {
                 AboutAppScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            // V1.1.0 新增：真正的 Shizuku 授权管理页
+            composable(Screen.ShizukuPermission.route) {
+                ShizukuPermissionScreen(
                     onBack = { navController.popBackStack() }
                 )
             }

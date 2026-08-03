@@ -271,12 +271,16 @@ object DeviceUtils {
         context.startActivity(intent)
     }
 
+    /**
+     * 兼容旧 UI 调用：返回是否有任意级别授权（含 PrefOnly/ServiceRunning）。
+     * 真正需要执行命令的场景，请调用 canShizukuReallyExecute()。
+     */
     fun checkShizukuPermission(): Boolean {
-        return try {
-            val prefs = App.instance.getSharedPreferences("all_in_one_prefs", Context.MODE_PRIVATE)
-            prefs.getBoolean("shizuku_authorized", false)
-        } catch (_: Exception) {
-            false
-        }
+        return ShizukuManager.isUiGranted()
+    }
+
+    /** 新增：真正能执行 shell 命令的 Shizuku 权限检查（Authorized(ROOT/SHELL) 才算通过） */
+    fun canShizukuReallyExecute(): Boolean {
+        return ShizukuManager.canReallyExecute()
     }
 }

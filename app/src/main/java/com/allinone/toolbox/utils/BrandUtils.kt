@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.allinone.toolbox.App
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * 品牌专属功能工具集
@@ -91,29 +94,36 @@ object BrandUtils {
         )
 
     /**
-     * 强开极致模式（小米专属）
+     * 强开极致模式（小米专属）- 使用协程异步回调版本
      *
      * MIUI/HyperOS 的「极致模式」会强制拉满 CPU/GPU 频率、关闭温控节流，用于游戏
      * 压榨性能。该开关本身在安全中心/游戏加速内，无公开 Intent 入口；这里通过
      * Shizuku 写入 settings provider 的 `miui_perf_mode` 标志位来尝试开启。
      *
-     * 需要 Shizuku 授权（API 23+）才能真正生效，未授权时返回 false。
+     * 需要真正的 Shizuku 授权（Authorized 级别）才能执行命令，
+     * 未授权时仅记录本地状态并返回 false。
      */
-    fun xiaomiEnableExtremeMode(context: Context): Boolean {
-        if (!DeviceUtils.checkShizukuPermission()) return false
-        return try {
-            // 通过 Settings.Global 写入性能模式标志位（仅小米系统识别）
-            // 注意：需要在 Shizuku 授权后由 Shell 身份写入，普通应用无 WRITE_SECURE_SETTINGS 权限
-            // 这里记录状态供 UI 反馈，真正写入由 Shizuku 执行
-            val prefs = App.instance.getSharedPreferences("all_in_one_prefs", Context.MODE_PRIVATE)
-            prefs.edit()
-                .putBoolean("xiaomi_extreme_mode", true)
-                .putLong("xiaomi_extreme_mode_time", System.currentTimeMillis())
-                .apply()
-            true
-        } catch (_: Exception) {
-            false
+    fun xiaomiEnableExtremeMode(
+        context: Context,
+        onResult: ((success: Boolean, logs: List<String>) -> Unit)? = null
+    ): Boolean {
+        // 先记录本地 UI 状态
+        val prefs = App.instance.getSharedPreferences("all_in_one_prefs", Context.MODE_PRIVATE)
+        prefs.edit()
+            .putBoolean("xiaomi_extreme_mode", true)
+            .putLong("xiaomi_extreme_mode_time", System.currentTimeMillis())
+            .apply()
+
+        // 真正执行：通过 ShizukuManager 写 settings
+        if (!DeviceUtils.canShizukuReallyExecute()) {
+            onResult?.invoke(false, listOf("Shizuku 未真正授权，仅记录本地状态"))
+            return false
         }
+        CoroutineScope(Dispatchers.IO).launch {
+            val (ok, logs) = ShizukuManager.xiaomiEnableExtremeModeShizuku()
+            onResult?.invoke(ok, logs)
+        }
+        return true
     }
 
     fun isXiaomiExtremeModeOn(): Boolean {
@@ -221,27 +231,31 @@ object BrandUtils {
     // ===================== 电量修改 =====================
 
     /**
-     * 修改系统电量显示（仅本地缓存）
+     * 修改系统电量显示 - 真正调用 Shizuku
      *
-     * Android 出于安全考虑禁止应用直接篡改真实电量，本工具仅作为演示：
      * 通过 Shizuku 调用 `dumpsys battery set level <n>` 可在调试层面修改
-     * 系统读取的电量数值，需 Shizuku 授权。未授权时仅记录到本地用于 UI 显示。
+     * 系统读取的电量数值，需真正的 Shizuku 授权。未授权时仅记录到本地用于 UI 显示。
+     *
+     * @param onResult 回调（是否真正写入成功，执行日志）
      */
-    fun setBatteryLevel(level: Int): Boolean {
+    fun setBatteryLevel(
+        level: Int,
+        onResult: ((success: Boolean, logs: List<String>) -> Unit)? = null
+    ): Boolean {
         if (level !in 0..100) return false
-        if (!DeviceUtils.checkShizukuPermission()) {
-            // 未授权时仅记录期望值
-            val prefs = App.instance.getSharedPreferences("all_in_one_prefs", Context.MODE_PRIVATE)
-            prefs.edit().putInt("fake_battery_level", level).apply()
+        // 先记录期望值（UI 反馈）
+        val prefs = App.instance.getSharedPreferences("all_in_one_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putInt("fake_battery_level", level).apply()
+
+        if (!DeviceUtils.canShizukuReallyExecute()) {
+            onResult?.invoke(false, listOf("Shizuku 未真正授权，仅记录本地期望值"))
             return false
         }
-        return try {
-            val prefs = App.instance.getSharedPreferences("all_in_one_prefs", Context.MODE_PRIVATE)
-            prefs.edit().putInt("fake_battery_level", level).apply()
-            true
-        } catch (_: Exception) {
-            false
+        CoroutineScope(Dispatchers.IO).launch {
+            val (ok, logs) = ShizukuManager.setBatteryLevelShizuku(level)
+            onResult?.invoke(ok, logs)
         }
+        return true
     }
 
     fun getFakeBatteryLevel(): Int {
@@ -262,7 +276,7 @@ object BrandUtils {
     // ===================== Scene 模块激活 =====================
 
     /**
-     * 一键激活 Scene 模块
+     * 一键激活 Scene 模块 - 真正校验 Shizuku
      *
      * Scene 是知名的游戏工具箱模块（独立开发者作品），常通过 Shizuku 实现
      * 性能调度、温控解锁等高级功能。本工具不内置 Scene，仅作为引导：
@@ -270,28 +284,14 @@ object BrandUtils {
      * 2. 若已安装则尝试拉起其主界面
      * 3. 若未安装则记录激活请求，UI 提示用户从本地安装包安装
      *
-     * 需要 Shizuku 授权。未授权时返回 false 并提示。
+     * 需要真正的 Shizuku 授权（Authorized 级别）。
      */
     fun activateScene(context: Context): SceneActivateResult {
-        if (!DeviceUtils.checkShizukuPermission()) {
+        // 真正的 Shizuku 校验
+        if (!DeviceUtils.canShizukuReallyExecute()) {
             return SceneActivateResult.NeedShizuku
         }
-        val installed = isAppInstalled(context, "com.omarea.scene")
-        if (!installed) {
-            // 记录激活请求状态
-            val prefs = App.instance.getSharedPreferences("all_in_one_prefs", Context.MODE_PRIVATE)
-            prefs.edit()
-                .putBoolean("scene_activate_requested", true)
-                .putLong("scene_activate_time", System.currentTimeMillis())
-                .apply()
-            return SceneActivateResult.NotInstalled
-        }
-        val ok = launchComponent(context, "com.omarea.scene", "com.omarea.scene.MainActivity")
-        return if (ok) {
-            val prefs = App.instance.getSharedPreferences("all_in_one_prefs", Context.MODE_PRIVATE)
-            prefs.edit().putBoolean("scene_activated", true).apply()
-            SceneActivateResult.Success
-        } else SceneActivateResult.Failed
+        return ShizukuManager.activateSceneShizuku(context)
     }
 
     fun isSceneActivated(): Boolean {
@@ -299,7 +299,7 @@ object BrandUtils {
         return prefs.getBoolean("scene_activated", false)
     }
 
-    private fun isAppInstalled(context: Context, pkg: String): Boolean {
+    internal fun isAppInstalled(context: Context, pkg: String): Boolean {
         return try {
             context.packageManager.getPackageInfo(pkg, 0)
             true

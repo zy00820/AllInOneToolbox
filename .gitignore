@@ -8,3 +8,6 @@
 /captures
 .externalNativeBuild
 .cxx
+# 签名密钥（不提交到仓库）
+*.jks
+keystore.properties

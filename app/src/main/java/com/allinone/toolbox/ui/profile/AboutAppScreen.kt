@@ -80,7 +80,7 @@ fun AboutAppScreen(
                         modifier = Modifier.padding(top = 8.dp)
                     )
                     Text(
-                        text = "Version 1.0.9",
+                        text = "Version 1.0.10",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                     )
@@ -158,7 +158,9 @@ fun AboutAppScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    VersionLogItem("V1.0.9", "新增会员激活系统\n新增了解开发者页面\n新增检查更新功能\n优化硬件检测准确性")
+                    VersionLogItem("V1.0.10", "适配Android 15/16 (API 36)\n支持16KB内存页对齐\n升级Gradle/Kotlin/Compose工具链\n优化Edge-to-Edge全面屏体验")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    VersionLogItem("V1.0.9", "新增会员激活系统\n新增了解了开发者页面\n新增检查更新功能\n优化硬件检测准确性")
                     Spacer(modifier = Modifier.height(8.dp))
                     VersionLogItem("V1.0.8", "新增系统快捷跳转功能\n新增深色模式支持\n优化用户界面")
                     Spacer(modifier = Modifier.height(8.dp))
@@ -176,7 +178,7 @@ fun AboutAppScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "• 最低支持: Android 7.0 (API 24)\n• 目标版本: Android 14 (API 34)\n• 开发语言: Kotlin\n• UI框架: Jetpack Compose + Material 3\n• 构建工具: Gradle",
+                        text = "• 最低支持: Android 7.0 (API 24)\n• 目标版本: Android 16 (API 36)\n• 开发语言: Kotlin\n• UI框架: Jetpack Compose + Material 3\n• 构建工具: Gradle 8.11.1",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -184,7 +186,7 @@ fun AboutAppScreen(
             }
 
             Text(
-                text = "© 2024 全能工具箱团队",
+                text = "© 2024-2026 全能工具箱团队",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth()

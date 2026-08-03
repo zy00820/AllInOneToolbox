@@ -3,6 +3,7 @@ package com.allinone.toolbox
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -44,6 +45,8 @@ import androidx.compose.runtime.collectAsState
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Android 15+: 启用Edge-to-Edge全面屏
+        enableEdgeToEdge()
         setContent {
             val context = this
             val themeViewModel: ThemeViewModel = viewModel(factory = ThemeViewModel.Factory(context))

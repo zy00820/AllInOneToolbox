@@ -18,8 +18,10 @@ import java.net.URL
  *  2. jsdelivr 失败时降级到 GitHub API（兜底，国内较慢）
  *
  * 下载策略：
- *  - 默认把 github.com 链接替换为 ghproxy 镜像前缀加速下载
- *  - 同时保留原始 Release 页面链接
+ *  - 多镜像节点自动降级，按测速排序（优先快节点）
+ *  - 节点失败时自动切换到下一个，最终回退 GitHub 直链
+ *
+ * 注：原 mirror.ghproxy.com 已下线（2024 年底起 SSL 失效），换为 gh-proxy.com 等可用节点。
  */
 object UpdateChecker {
 
@@ -32,20 +34,46 @@ object UpdateChecker {
     // Release 下载页
     private const val RELEASE_PAGE =
         "https://github.com/zy00820/AllInOneToolbox/releases/latest"
-    // ghproxy 镜像前缀（下载加速）
-    private const val GHPROXY_PREFIX = "https://mirror.ghproxy.com/"
 
-    /** 当前已安装版本号，如 "1.0.12" */
+    /**
+     * 镜像下载节点（按实测速度排序，首项最快）
+     * 格式：{原始GitHub URL} 前面拼接节点前缀
+     */
+    private val MIRROR_PREFIXES = listOf(
+        "https://gh-proxy.com/",          // 实测最快 ~530 KB/s
+        "https://ghproxy.net/",           // ~160 KB/s
+        // 直接 GitHub 原链兜底（不拼接前缀，留空字符串标记）
+        ""
+    )
+
+    /** 当前已安装版本号，如 "1.0.15" */
     fun currentVersion(): String = BuildConfig.VERSION_NAME
 
-    /** 给 URL 加 ghproxy 镜像前缀；已是镜像或非 GitHub 域名则原样返回 */
-    private fun withMirror(url: String): String {
-        if (url.startsWith(GHPROXY_PREFIX)) return url
-        if (url.contains("github.com")) {
-            // 多个 ghproxy 节点，用官方的 mirror.ghproxy.com
-            return GHPROXY_PREFIX + url.removeSuffix("/")
-        }
+    /**
+     * 给 GitHub URL 加镜像前缀
+     * @param url 原始 URL
+     * @param prefixIndex 使用的镜像节点索引（默认 0 = 最快节点）
+     */
+    private fun withMirror(url: String, prefixIndex: Int = 0): String {
+        if (prefixIndex >= MIRROR_PREFIXES.size) return url  // 兜底原链
+        val prefix = MIRROR_PREFIXES[prefixIndex]
+        if (prefix.isEmpty()) return url                     // 原链
+        if (url.startsWith(prefix)) return url               // 已拼接
+        if (url.contains("github.com")) return prefix + url.removeSuffix("/")
         return url
+    }
+
+    /** 获取当前所有可用镜像下载链接（供 UI 展示多档选项） */
+    fun getMirrorUrls(githubUrl: String): List<Pair<String, String>> {
+        return MIRROR_PREFIXES.mapIndexed { i, prefix ->
+            val label = when {
+                prefix.isEmpty() -> "GitHub 原链"
+                prefix.contains("gh-proxy.com") -> "gh-proxy.com（推荐）"
+                prefix.contains("ghproxy.net") -> "ghproxy.net"
+                else -> prefix.removePrefix("https://").removeSuffix("/")
+            }
+            withMirror(githubUrl, i) to label
+        }
     }
 
     suspend fun checkLatestVersion(): UpdateResult = withContext(Dispatchers.IO) {
@@ -140,10 +168,10 @@ object UpdateChecker {
         return false
     }
 
-    /** 打开加速后的 APK 下载链接（直链） */
+    /** 打开加速后的 APK 下载链接（直链，默认最快节点） */
     fun openApkDownload(context: Context, apkUrl: String) {
         try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(withMirror(apkUrl))).apply {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(withMirror(apkUrl, 0))).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)

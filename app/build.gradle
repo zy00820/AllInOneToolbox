@@ -21,8 +21,8 @@ android {
         applicationId "com.allinone.toolbox"
         minSdk rootProject.min_sdk
         targetSdk rootProject.target_sdk
-        versionCode 14
-        versionName "1.0.14"
+        versionCode 15
+        versionName "1.0.15"
     }
 
     buildTypes {

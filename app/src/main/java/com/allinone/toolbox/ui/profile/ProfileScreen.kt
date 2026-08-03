@@ -227,33 +227,42 @@ fun ProfileScreen(
     // 发现新版本对话框
     updateResult?.let { result ->
         if (result is UpdateChecker.UpdateResult.Success) {
+            val mirrors = remember(result) { UpdateChecker.getMirrorUrls(result.apkUrl) }
             AlertDialog(
                 onDismissRequest = { updateResult = null },
-                title = { Text("发现新版本") },
+                title = { Text("发现新版本 V${result.latestVersion}") },
                 text = {
                     Column {
-                        Text("最新版本：V${result.latestVersion}")
                         Text("当前版本：V${BuildConfig.VERSION_NAME}")
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "推荐用「直接下载」（国内加速镜像），速度更快。",
+                            text = "选择下载源（推荐 gh-proxy.com 节点，国内最快）：",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        mirrors.forEach { (url, label) ->
+                            TextButton(
+                                onClick = {
+                                    try {
+                                        val intent = android.content.Intent(
+                                            android.content.Intent.ACTION_VIEW,
+                                            android.net.Uri.parse(url)
+                                        ).apply { addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK) }
+                                        context.startActivity(intent)
+                                    } catch (_: Exception) {
+                                        Toast.makeText(context, "无法打开浏览器", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("下载：$label")
+                            }
+                        }
                     }
                 },
                 confirmButton = {
-                    Row {
-                        TextButton(onClick = {
-                            UpdateChecker.openReleasePage(context)
-                            updateResult = null
-                        }) { Text("Release 页") }
-                        TextButton(onClick = {
-                            UpdateChecker.openApkDownload(context, result.apkUrl)
-                            updateResult = null
-                        }) { Text("直接下载") }
-                        TextButton(onClick = { updateResult = null }) { Text("稍后") }
-                    }
+                    TextButton(onClick = { updateResult = null }) { Text("稍后") }
                 }
             )
         }

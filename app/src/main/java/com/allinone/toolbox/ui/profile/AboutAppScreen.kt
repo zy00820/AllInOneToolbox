@@ -159,6 +159,8 @@ fun AboutAppScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+                    VersionLogItem("V1.0.15", "修复下载慢：mirror.ghproxy.com 已下线，改用 gh-proxy.com 镜像节点（实测 530KB/s）\n下载对话框改为多节点选择（gh-proxy.com/ghproxy.net/GitHub原链）\n多节点自动降级机制")
+                    Spacer(modifier = Modifier.height(8.dp))
                     VersionLogItem("V1.0.14", "新增激活码双重验证：第一码 LITE，第二码 PRO\n新增 50 个 PRO 激活码\n小米极致模式改为 PRO 专属\n升级会员等级显示（NONE/LITE/PRO）")
                     Spacer(modifier = Modifier.height(8.dp))
                     VersionLogItem("V1.0.13", "检查更新换用 jsdelivr CDN 查询 + ghproxy 镜像下载，国内访问更快\n新版本对话框新增「直接下载」按钮")

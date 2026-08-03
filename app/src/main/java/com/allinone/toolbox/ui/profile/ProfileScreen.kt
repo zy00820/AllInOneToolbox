@@ -149,8 +149,12 @@ fun ProfileScreen(
         item {
             SettingsCard(
                 icon = Icons.Default.Verified,
-                title = "激活会员",
-                subtitle = if (isMember) ActivationUtils.getActivationInfo() else "输入激活码开启全部功能",
+                title = "激活会员（LITE / PRO 双重验证）",
+                subtitle = when {
+                    ActivationUtils.isProMember() -> "会员 PRO · 已激活 · 全部权益解锁"
+                    ActivationUtils.isMember() -> "会员 LITE · 已激活 · 可继续激活 PRO"
+                    else -> "第一码激活 LITE，第二码升级 PRO"
+                },
                 onClick = onNavigateToActivate
             )
         }

@@ -1,12 +1,13 @@
 {
-  "versionName": "1.0.13",
-  "versionCode": 13,
-  "title": "全能工具箱 V1.0.13 - 国内加速版检查更新",
-  "apkUrl": "https://github.com/zy00820/AllInOneToolbox/releases/download/v1.0.13/AllInOneToolbox-v1.0.13.apk",
-  "releasePage": "https://github.com/zy00820/AllInOneToolbox/releases/tag/v1.0.13",
+  "versionName": "1.0.14",
+  "versionCode": 14,
+  "title": "全能工具箱 V1.0.14 - 激活码双重验证 LITE/PRO",
+  "apkUrl": "https://github.com/zy00820/AllInOneToolbox/releases/download/v1.0.14/AllInOneToolbox-v1.0.14.apk",
+  "releasePage": "https://github.com/zy00820/AllInOneToolbox/releases/tag/v1.0.14",
   "changelog": [
-    "检查更新换用 jsdelivr CDN 查询版本清单，国内访问更快",
-    "下载链接默认加 ghproxy 镜像加速",
-    "发现新版本弹窗新增「直接下载」按钮"
+    "新增激活码双重验证：第一码 LITE，第二码 PRO",
+    "新增 50 个 PRO 激活码（AT2024-Pxxx）",
+    "小米极致模式改为 PRO 专属权益",
+    "会员等级显示：NONE / LITE / PRO"
   ]
 }

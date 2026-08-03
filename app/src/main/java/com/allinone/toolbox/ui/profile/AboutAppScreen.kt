@@ -159,6 +159,8 @@ fun AboutAppScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+                    VersionLogItem("V1.0.14", "新增激活码双重验证：第一码 LITE，第二码 PRO\n新增 50 个 PRO 激活码\n小米极致模式改为 PRO 专属\n升级会员等级显示（NONE/LITE/PRO）")
+                    Spacer(modifier = Modifier.height(8.dp))
                     VersionLogItem("V1.0.13", "检查更新换用 jsdelivr CDN 查询 + ghproxy 镜像下载，国内访问更快\n新版本对话框新增「直接下载」按钮")
                     Spacer(modifier = Modifier.height(8.dp))
                     VersionLogItem("V1.0.12", "修复检查更新功能：真实联网查询 GitHub 最新 Release\n修复版本号写死问题，全部改为动态读取\n发现新版本支持一键跳转浏览器下载")

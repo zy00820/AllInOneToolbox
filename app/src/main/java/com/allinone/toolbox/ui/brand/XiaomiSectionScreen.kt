@@ -129,14 +129,14 @@ fun XiaomiSectionScreen(
                         ) {
                             Button(
                                 onClick = {
-                                    if (!ActivationUtils.isMember()) {
-                                        Toast.makeText(context, "请先激活会员使用此功能", Toast.LENGTH_SHORT).show()
+                                    if (!ActivationUtils.isProMember()) {
+                                        Toast.makeText(context, "此功能为 PRO 专属，请先激活会员 PRO", Toast.LENGTH_LONG).show()
                                         return@Button
                                     }
                                     showConfirmDialog = true
                                 }
                             ) {
-                                Text(if (extremeOn) "重新开启" else "一键开启")
+                                Text(if (extremeOn) "重新开启" else "一键开启（PRO）")
                             }
                             OutlinedButton(
                                 onClick = {

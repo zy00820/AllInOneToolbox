@@ -219,12 +219,17 @@ private fun MemberStatusCard(isMember: Boolean) {
             )
             Spacer(modifier = Modifier.padding(horizontal = 8.dp))
             Column {
+                val lv = ActivationUtils.memberLevel()
                 Text(
-                    text = if (isMember) "已是会员" else "非会员",
+                    text = lv.displayName,
                     style = MaterialTheme.typography.titleSmall
                 )
                 Text(
-                    text = if (isMember) "全部功能可用" else "部分功能需激活会员",
+                    text = when {
+                        lv.level >= ActivationUtils.MemberLevel.PRO.level -> "PRO 专属：极致模式 + 全部权益"
+                        lv.level >= ActivationUtils.MemberLevel.LITE.level -> "LITE：基础会员已可用，可继续激活 PRO"
+                        else -> "激活后解锁 Shizuku 授权等功能"
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
